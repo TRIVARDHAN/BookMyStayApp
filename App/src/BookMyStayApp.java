@@ -1,64 +1,135 @@
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.Map;
+// Reservation Class
+class Reservation {
+    private String reservationId;
+    private String guestName;
+    private String roomType;
+    private double price;
 
-class RoomInventory {
-    private HashMap<String, Integer> inventory;
-    public RoomInventory() {
-
-        inventory = new HashMap<>();
-
-        inventory.put("Single Room", 5);
-        inventory.put("Double Room", 3);
-        inventory.put("Suite Room", 2);
+    public Reservation(String reservationId, String guestName, String roomType, double price) {
+        this.reservationId = reservationId;
+        this.guestName = guestName;
+        this.roomType = roomType;
+        this.price = price;
     }
 
-    public int getAvailability(String roomType) {
-        return inventory.getOrDefault(roomType, 0);
+    public String getReservationId() {
+        return reservationId;
     }
 
-    public void updateAvailability(String roomType, int newCount) {
-        inventory.put(roomType, newCount);
+    public String getGuestName() {
+        return guestName;
     }
 
-    public void displayInventory() {
+    public String getRoomType() {
+        return roomType;
+    }
 
-        System.out.println("\nCurrent Room Inventory:");
+    public double getPrice() {
+        return price;
+    }
 
-        for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue() + " rooms available");
-        }
+    @Override
+    public String toString() {
+        return "Reservation ID: " + reservationId +
+                ", Guest: " + guestName +
+                ", Room: " + roomType +
+                ", Price: ₹" + price;
     }
 }
 
+// Booking History (stores confirmed reservations)
+class BookingHistory {
+    private List<Reservation> reservations;
 
+    public BookingHistory() {
+        reservations = new ArrayList<>();
+    }
+
+    // Add confirmed booking
+    public void addReservation(Reservation reservation) {
+        reservations.add(reservation);
+    }
+
+    // Retrieve all bookings
+    public List<Reservation> getAllReservations() {
+        return new ArrayList<>(reservations); // return copy (immutability)
+    }
+}
+
+// Reporting Service
+class BookingReportService {
+
+    // Display all bookings
+    public void displayAllBookings(List<Reservation> reservations) {
+        System.out.println("\n=== Booking History ===");
+
+        if (reservations.isEmpty()) {
+            System.out.println("No bookings found.");
+            return;
+        }
+
+        for (Reservation r : reservations) {
+            System.out.println(r);
+        }
+    }
+
+    // Generate summary report
+    public void generateSummaryReport(List<Reservation> reservations) {
+        System.out.println("\n=== Booking Summary Report ===");
+
+        int totalBookings = reservations.size();
+        double totalRevenue = 0;
+
+        for (Reservation r : reservations) {
+            totalRevenue += r.getPrice();
+        }
+
+        System.out.println("Total Bookings: " + totalBookings);
+        System.out.println("Total Revenue: ₹" + totalRevenue);
+    }
+}
+
+// Main Class
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        System.out.println("=================================");
-        System.out.println("        Book My Stay App");
-        System.out.println("   Centralized Room Inventory");
-        System.out.println("          Version 3.1");
-        System.out.println("=================================");
+        Scanner scanner = new Scanner(System.in);
+        BookingHistory history = new BookingHistory();
+        BookingReportService reportService = new BookingReportService();
 
+        // Simulating confirmed bookings
+        history.addReservation(new Reservation("RES101", "Arun", "Deluxe", 3000));
+        history.addReservation(new Reservation("RES102", "Priya", "Suite", 5000));
+        history.addReservation(new Reservation("RES103", "Kiran", "Standard", 2000));
 
-        RoomInventory inventory = new RoomInventory();
+        while (true) {
+            System.out.println("\n=== Admin Panel ===");
+            System.out.println("1. View Booking History");
+            System.out.println("2. Generate Summary Report");
+            System.out.println("3. Exit");
 
+            int choice = scanner.nextInt();
 
-        inventory.displayInventory();
+            switch (choice) {
+                case 1:
+                    reportService.displayAllBookings(history.getAllReservations());
+                    break;
 
+                case 2:
+                    reportService.generateSummaryReport(history.getAllReservations());
+                    break;
 
-        System.out.println("\nChecking availability for Single Room:");
-        System.out.println("Available: " + inventory.getAvailability("Single Room"));
+                case 3:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
 
-
-        System.out.println("\nUpdating Suite Room availability...");
-        inventory.updateAvailability("Suite Room", 4);
-
-
-        inventory.displayInventory();
-
-        System.out.println("\nApplication Finished.");
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
     }
 }
