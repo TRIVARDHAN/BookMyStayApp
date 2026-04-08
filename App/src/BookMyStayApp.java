@@ -1,64 +1,87 @@
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.Map;
+// Reservation: Represents booking intent
+class Reservation {
+    private String guestName;
+    private String roomType;
 
-class RoomInventory {
-    private HashMap<String, Integer> inventory;
-    public RoomInventory() {
-
-        inventory = new HashMap<>();
-
-        inventory.put("Single Room", 5);
-        inventory.put("Double Room", 3);
-        inventory.put("Suite Room", 2);
+    public Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
+        this.roomType = roomType;
     }
 
-    public int getAvailability(String roomType) {
-        return inventory.getOrDefault(roomType, 0);
+    public String getGuestName() {
+        return guestName;
     }
 
-    public void updateAvailability(String roomType, int newCount) {
-        inventory.put(roomType, newCount);
+    public String getRoomType() {
+        return roomType;
     }
 
-    public void displayInventory() {
-
-        System.out.println("\nCurrent Room Inventory:");
-
-        for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue() + " rooms available");
-        }
+    public void display() {
+        System.out.println("Guest: " + guestName + " | Requested Room: " + roomType);
     }
 }
 
+// Booking Request Queue (FIFO)
+class BookingRequestQueue {
+    private Queue<Reservation> queue;
 
+    public BookingRequestQueue() {
+        queue = new LinkedList<>();
+    }
+
+    // Add request (enqueue)
+    public void addRequest(Reservation reservation) {
+        queue.offer(reservation);
+        System.out.println("Request added for " + reservation.getGuestName());
+    }
+
+    // View all requests (without removing)
+    public void displayQueue() {
+        System.out.println("\nBooking Request Queue (FIFO Order):");
+
+        if (queue.isEmpty()) {
+            System.out.println("No pending requests.");
+            return;
+        }
+
+        for (Reservation r : queue) {
+            r.display();
+        }
+    }
+
+    // Peek next request (no removal)
+    public Reservation peekNext() {
+        return queue.peek();
+    }
+}
+
+// Main Class
 public class BookMyStayApp {
 
     public static void main(String[] args) {
 
-        System.out.println("=================================");
-        System.out.println("        Book My Stay App");
-        System.out.println("   Centralized Room Inventory");
-        System.out.println("          Version 3.1");
-        System.out.println("=================================");
+        // Initialize booking queue
+        BookingRequestQueue BookMyStay  = new BookingRequestQueue();
 
+        // Simulate multiple guest requests (arrival order matters)
+        BookMyStay .addRequest(new Reservation("Alice", "Single"));
+        BookMyStay .addRequest(new Reservation("Bob", "Double"));
+        BookMyStay .addRequest(new Reservation("Charlie", "Suite"));
+        BookMyStay .addRequest(new Reservation("Diana", "Single"));
 
-        RoomInventory inventory = new RoomInventory();
+        // Display queue (FIFO order)
+        BookMyStay .displayQueue();
 
+        // Show next request to be processed (without removing)
+        Reservation next = BookMyStay .peekNext();
 
-        inventory.displayInventory();
-
-
-        System.out.println("\nChecking availability for Single Room:");
-        System.out.println("Available: " + inventory.getAvailability("Single Room"));
-
-
-        System.out.println("\nUpdating Suite Room availability...");
-        inventory.updateAvailability("Suite Room", 4);
-
-
-        inventory.displayInventory();
-
-        System.out.println("\nApplication Finished.");
+        System.out.println("\nNext Request to Process:");
+        if (next != null) {
+            next.display();
+        } else {
+            System.out.println("No requests available.");
+        }
     }
 }
